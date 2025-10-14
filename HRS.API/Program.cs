@@ -1,12 +1,10 @@
 using System.Text;
-using FluentValidation;
+using HRS.API.Endpoints; 
 using HRS.API.Filters;
 using HRS.API.Middleware;
 using HRS.API.Services;
 using HRS.API.Services.Interfaces;
-using HRS.Domain.Interfaces;
 using HRS.Infrastructure;
-using HRS.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -108,5 +106,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapEmailEndpoints(); 
 
 app.Run();

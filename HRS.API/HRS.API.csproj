@@ -38,11 +38,11 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Contracts\DTOs\Auth\" />
       <Folder Include="Contracts\DTOs\Health\" />
       <Folder Include="Contracts\DTOs\Item\" />
       <Folder Include="Contracts\DTOs\Package\" />
       <Folder Include="Contracts\DTOs\User\" />
-      <Folder Include="Controllers\" />
       <Folder Include="Mappings\Profiles\" />
       <Folder Include="Services\Helpers\" />
       <Folder Include="Validators\Auth\" />

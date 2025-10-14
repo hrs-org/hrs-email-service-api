@@ -1,10 +1,8 @@
 using System.Text;
-using HRS.API.Endpoints; 
 using HRS.API.Filters;
 using HRS.API.Middleware;
 using HRS.API.Services;
 using HRS.API.Services.Interfaces;
-using HRS.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IEmailBuilderService, EmailBuilderService>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAppConfiguration, AppConfiguration>();
 builder.Services.AddHttpContextAccessor();
 
@@ -56,10 +55,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        b => b.MigrationsAssembly("HRS.Migrations")));
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 
@@ -106,6 +101,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapEmailEndpoints(); 
 
 app.Run();

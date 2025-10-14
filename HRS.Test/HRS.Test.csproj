@@ -23,8 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\HRS.API\HRS.API.csproj" />
-        <ProjectReference Include="..\HRS.Infrastructure\HRS.Infrastructure.csproj" />
-        <ProjectReference Include="..\HRS.Domain\HRS.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,9 +1,5 @@
-using System.Threading.Tasks;
 using HRS.API.Services;
-using HRS.API.Services.Interfaces;
-using HRS.Domain.Interfaces;
 using NSubstitute;
-using Xunit;
 
 namespace HRS.Test.API.Services;
 

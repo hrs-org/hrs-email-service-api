@@ -1,6 +1,7 @@
 using HRS.API.Contracts.DTOs;
 using HRS.API.Contracts.DTOs.Email;
 using HRS.API.Services.Interfaces;
+using HRS.Shared.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRS.API.Controllers;

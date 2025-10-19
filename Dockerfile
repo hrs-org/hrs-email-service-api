@@ -1,8 +1,7 @@
 # Use the official .NET runtime as base image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
 
 RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 RUN apt-get update && \
@@ -17,7 +16,15 @@ RUN apt-get update && \
 # Use the SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG GITHUB_TOKEN
 WORKDIR /app
+
+# Configure GitHub Packages authentication if token is provided
+RUN if [ ! -z "$GITHUB_TOKEN" ]; then \
+    dotnet nuget add source --username docker --password $GITHUB_TOKEN \
+    --store-password-in-clear-text \
+    --name github "https://nuget.pkg.github.com/hrs-org/index.json"; \
+    fi
 
 # Copy solution file first
 COPY ["HikingRentalStore.sln", "./"]
@@ -56,5 +63,8 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
+
+# Set environment variable to listen on port 80
+ENV ASPNETCORE_URLS=http://+:80
 
 ENTRYPOINT ["dotnet", "HRS.API.dll"]

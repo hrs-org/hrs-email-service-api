@@ -69,6 +69,9 @@ builder.Services.AddCors(options =>
     );
 });
 
+// Add health checks
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,6 +88,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowWebClient");
 
 app.MapControllers();
+
+// Map health check endpoints
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
 
 app.Run();
 

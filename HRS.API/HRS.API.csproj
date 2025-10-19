@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -32,17 +32,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HRS.Infrastructure\HRS.Infrastructure.csproj" />
-        <ProjectReference Include="..\HRS.Domain\HRS.Domain.csproj" />
-        <ProjectReference Include="..\HRS.Migrations\HRS.Migrations.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <Folder Include="Contracts\DTOs\Auth\" />
       <Folder Include="Contracts\DTOs\Health\" />
       <Folder Include="Contracts\DTOs\Item\" />
       <Folder Include="Contracts\DTOs\Package\" />
       <Folder Include="Contracts\DTOs\User\" />
-      <Folder Include="Controllers\" />
       <Folder Include="Mappings\Profiles\" />
       <Folder Include="Services\Helpers\" />
       <Folder Include="Validators\Auth\" />

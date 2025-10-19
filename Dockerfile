@@ -4,6 +4,16 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        telnet \
+        iputils-ping && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
+
 # Use the SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -39,6 +49,9 @@ RUN dotnet publish "HRS.API/HRS.API.csproj" -c "$BUILD_CONFIGURATION" \
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app

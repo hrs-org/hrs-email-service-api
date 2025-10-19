@@ -1,12 +1,8 @@
 using System.Text;
-using FluentValidation;
 using HRS.API.Filters;
 using HRS.API.Middleware;
 using HRS.API.Services;
 using HRS.API.Services.Interfaces;
-using HRS.Domain.Interfaces;
-using HRS.Infrastructure;
-using HRS.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IEmailBuilderService, EmailBuilderService>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAppConfiguration, AppConfiguration>();
 builder.Services.AddHttpContextAccessor();
 
@@ -56,31 +53,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        b => b.MigrationsAssembly("HRS.Migrations")));
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
-            )
-        };
-    });
 
 builder.Services.AddCors(options =>
 {
@@ -98,15 +73,18 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
-if (app.Environment.IsDevelopment()) app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "HRS API v1");
+    c.RoutePrefix = "swagger";
+});
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowWebClient");
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+

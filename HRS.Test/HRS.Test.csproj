@@ -23,15 +23,15 @@
 
     <ItemGroup>
         <ProjectReference Include="..\HRS.API\HRS.API.csproj" />
-        <ProjectReference Include="..\HRS.Infrastructure\HRS.Infrastructure.csproj" />
-        <ProjectReference Include="..\HRS.Domain\HRS.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="API\Controllers\" />
       <Folder Include="API\Mappings\Profiles\" />
       <Folder Include="API\Validators\Auth\" />
       <Folder Include="API\Validators\Item\" />
       <Folder Include="API\Validators\Package\" />
+      <Folder Include="Infrastructure\Repositories\" />
     </ItemGroup>
 
 </Project>

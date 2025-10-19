@@ -24,7 +24,7 @@ public class EmailService : IEmailService
             throw new ArgumentException("Recipient is required", nameof(recipient));
 
         var success = await _emailSender.SendEmailAsync(recipient, subject, body, isHtml);
-        
+
         if (!success)
         {
             _logger.LogError("Failed to send simple email to {Recipient}", recipient);
@@ -43,9 +43,9 @@ public class EmailService : IEmailService
 
         var template = _emailBuilder.BuildVerificationEmailTemplate(email, verificationToken, firstName);
         var body = _emailBuilder.GenerateEmailBody(template);
-        
+
         var success = await _emailSender.SendEmailAsync(email, template.Title, body, isHtml: true);
-        
+
         if (!success)
         {
             _logger.LogError("Failed to send verification email to {Email}", email);
@@ -64,9 +64,9 @@ public class EmailService : IEmailService
 
         var template = _emailBuilder.BuildPasswordResetEmailTemplate(email, resetToken, firstName);
         var body = _emailBuilder.GenerateEmailBody(template);
-        
+
         var success = await _emailSender.SendEmailAsync(email, template.Title, body, isHtml: true);
-        
+
         if (!success)
         {
             _logger.LogError("Failed to send password reset email to {Email}", email);
@@ -85,9 +85,9 @@ public class EmailService : IEmailService
 
         var template = _emailBuilder.BuildEmployeeWelcomeEmailTemplate(email, password, firstName);
         var body = _emailBuilder.GenerateEmailBody(template);
-        
+
         var success = await _emailSender.SendEmailAsync(email, template.Title, body, isHtml: true);
-        
+
         if (!success)
         {
             _logger.LogError("Failed to send employee welcome email to {Email}", email);

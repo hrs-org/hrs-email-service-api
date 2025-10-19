@@ -16,7 +16,15 @@ RUN apt-get update && \
 # Use the SDK image to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG GITHUB_TOKEN
 WORKDIR /app
+
+# Configure GitHub Packages authentication if token is provided
+RUN if [ ! -z "$GITHUB_TOKEN" ]; then \
+    dotnet nuget add source --username docker --password $GITHUB_TOKEN \
+    --store-password-in-clear-text \
+    --name github "https://nuget.pkg.github.com/hrs-org/index.json"; \
+    fi
 
 # Copy solution file first
 COPY ["HikingRentalStore.sln", "./"]

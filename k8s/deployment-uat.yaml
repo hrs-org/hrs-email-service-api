@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     name: hrs-email-service
-    namespace: maintenance
+    namespace: email
     labels:
         app: hrs-email-service
 spec:
@@ -78,7 +78,7 @@ apiVersion: v1
 kind: Service
 metadata:
     name: hrs-email-service
-    namespace: maintenance
+    namespace: email
     labels:
         app: hrs-email-service
 spec:

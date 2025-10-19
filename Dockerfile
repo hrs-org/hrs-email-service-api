@@ -1,8 +1,7 @@
 # Use the official .NET runtime as base image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
 
 RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 RUN apt-get update && \
@@ -56,5 +55,8 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 # Create a non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
+
+# Set environment variable to listen on port 80
+ENV ASPNETCORE_URLS=http://+:80
 
 ENTRYPOINT ["dotnet", "HRS.API.dll"]

@@ -31,7 +31,6 @@
       <Folder Include="API\Validators\Auth\" />
       <Folder Include="API\Validators\Item\" />
       <Folder Include="API\Validators\Package\" />
-      <Folder Include="Infrastructure\Repositories\" />
     </ItemGroup>
 
 </Project>

@@ -17,6 +17,7 @@
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="FluentValidation" Version="12.0.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+        <PackageReference Include="HRS.Shared.Core" Version="0.1.6" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.19" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
@@ -29,20 +30,6 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Contracts\DTOs\Auth\" />
-      <Folder Include="Contracts\DTOs\Health\" />
-      <Folder Include="Contracts\DTOs\Item\" />
-      <Folder Include="Contracts\DTOs\Package\" />
-      <Folder Include="Contracts\DTOs\User\" />
-      <Folder Include="Mappings\Profiles\" />
-      <Folder Include="Services\Helpers\" />
-      <Folder Include="Validators\Auth\" />
-      <Folder Include="Validators\Item\" />
-      <Folder Include="Validators\Package\" />
-      <Folder Include="Validators\User\" />
     </ItemGroup>
 
 </Project>

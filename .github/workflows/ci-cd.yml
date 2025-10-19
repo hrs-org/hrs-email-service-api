@@ -2,13 +2,11 @@ name: HRS Email Service CI/CD
 
 on:
     pull_request:
-        branches: [main, develop]
+        branches: [develop]
     push:
-        branches: [main, develop]
-        paths-ignore:
-            - "**.md"
-            - ".gitignore"
-            - "docs/**"
+        branches: [develop]
+        tags:
+            - "v*.*.*"
 
 permissions:
     contents: read

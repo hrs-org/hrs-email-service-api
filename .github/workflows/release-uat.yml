@@ -25,7 +25,7 @@ permissions:
 env:
     AZURE_RESOURCE_GROUP: rg-hrsm-uat
     AKS_CLUSTER_NAME: hrsm-uat-aks
-    NAMESPACE: maintenance
+    NAMESPACE: email
     DEPLOYMENT_NAME: hrs-email-service
     SERVICE_NAME: hrs-email-service
 

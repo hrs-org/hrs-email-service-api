@@ -132,6 +132,7 @@ jobs:
                   dotnet-sonarscanner begin \
                     /k:"hrs-org_hrs-email-service-api" \
                     /o:"hrs-org" \
+                    /d:sonar.projectBaseDir="$(pwd)" \
                     /d:sonar.token="$SONAR_TOKEN" \
                     /d:sonar.host.url="https://sonarcloud.io" \
                     /d:sonar.cs.vstest.reportsPaths="./coverage/TestResults.trx" \

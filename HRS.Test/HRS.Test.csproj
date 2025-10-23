@@ -25,12 +25,4 @@
         <ProjectReference Include="..\HRS.API\HRS.API.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="API\Controllers\" />
-      <Folder Include="API\Mappings\Profiles\" />
-      <Folder Include="API\Validators\Auth\" />
-      <Folder Include="API\Validators\Item\" />
-      <Folder Include="API\Validators\Package\" />
-    </ItemGroup>
-
 </Project>

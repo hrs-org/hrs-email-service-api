@@ -377,7 +377,7 @@ jobs:
                   docker ps -a
 
                   echo "Container logs:"
-                  docker logs hrs-maintenance-service
+                  docker logs hrs-email-service
 
                   echo "Testing health endpoint:"
                   curl -f http://localhost:5000/health || echo "Health endpoint not available"

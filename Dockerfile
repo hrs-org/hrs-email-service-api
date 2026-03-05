@@ -1,20 +1,19 @@
-# Use the official .NET runtime as base image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# Use Alpine-based runtime (smaller, fewer vulnerabilities)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
 WORKDIR /app
-EXPOSE 80
 
-RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Install required tools using Alpine package manager
+RUN apk add --no-cache \
         ca-certificates \
         curl \
-        telnet \
-        iputils-ping && \
-    rm -rf /var/lib/apt/lists/* && \
+        busybox-extras \
+        iputils && \
     update-ca-certificates
 
-# Use the SDK image to build the app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+EXPOSE 80
+
+# Use Alpine SDK for build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 ARG GITHUB_TOKEN
 ARG USE_LOCAL_NUGET=false
@@ -66,8 +65,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Create a non-root user
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
+# Create non-root user with high UID (Alpine syntax)
+RUN adduser -D -u 10002 appuser && chown -R appuser /app
 USER appuser
 
 # Set environment variable to listen on port 8080 (non-privileged port)

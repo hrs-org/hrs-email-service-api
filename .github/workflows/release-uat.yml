@@ -25,7 +25,7 @@ permissions:
 env:
     AZURE_RESOURCE_GROUP: rg-hrsm-uat
     AKS_CLUSTER_NAME: hrsm-uat-aks
-    NAMESPACE: email
+    NAMESPACE: "${{ github.event.inputs.environment }}"
     DEPLOYMENT_NAME: hrs-email-service
     SERVICE_NAME: hrs-email-service
 
@@ -98,6 +98,7 @@ jobs:
                   # Replace placeholders in the deployment file
                   sed "s|__ACR_NAME__|${{ secrets.ACR_NAME }}|g" k8s/deployment-uat.yaml | \
                   sed "s|__IMAGE_TAG__|${{ github.event.inputs.version }}|g" | \
+                  sed "s|__NAMESPACE__|${{ env.NAMESPACE }}|g" | \
                   sed "s|__SMTP_HOST__|${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}|g" | \
                   sed "s|__SMTP_PORT__|${{ secrets.SMTP_PORT || '587' }}|g" | \
                   sed "s|__SMTP_USERNAME__|${{ secrets.SMTP_USERNAME || 'hikingrentalstore@gmail.com' }}|g" | \

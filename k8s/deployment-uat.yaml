@@ -1,4 +1,15 @@
 ---
+# HRS Email Service Account
+# Security: automountServiceAccountToken is disabled because this service
+# only sends emails via SMTP and does not require Kubernetes API access.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: hrs-email-service-sa
+    namespace: __NAMESPACE__
+automountServiceAccountToken: false
+
+---
 # HRS Email Service Deployment
 apiVersion: apps/v1
 kind: Deployment

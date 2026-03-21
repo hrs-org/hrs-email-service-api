@@ -291,11 +291,14 @@ jobs:
                     --timeout=300s
 
             - name: Run integration checks against deployed API
+              env:
+                  BASE_URL: ${{ secrets.UAT_API_ENDPOINT }}
+                  FRONTEND_ORIGIN: ${{ secrets.FRONTEND_URL }}
               run: |
                   set -euo pipefail
 
-                  BASE_URL="${{ secrets.UAT_API_ENDPOINT }}"
-                  FRONTEND_ORIGIN="${{ secrets.FRONTEND_URL }}"
+                  BASE_URL="${BASE_URL%/}"
+                  FRONTEND_ORIGIN="${FRONTEND_ORIGIN%/}"
 
                   if [ -z "$BASE_URL" ]; then
                     echo "UAT_API_ENDPOINT secret is not set"
@@ -342,6 +345,9 @@ jobs:
 
             - name: Post integration test summary
               if: always()
+              env:
+                  GATEWAY_ENDPOINT: ${{ secrets.UAT_API_ENDPOINT }}
+                  FRONTEND_ORIGIN: ${{ secrets.FRONTEND_URL  }}
               run: |
                   echo "## 🧪 Integration Test Summary" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
@@ -351,8 +357,8 @@ jobs:
                   echo "| **Environment** | \`${{ github.event.inputs.environment }}\` |" >> $GITHUB_STEP_SUMMARY
                   echo "| **Version** | \`${{ github.event.inputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
                   echo "| **Namespace** | \`${{ env.NAMESPACE }}\` |" >> $GITHUB_STEP_SUMMARY
-                  echo "| **Endpoint** | \`${{ secrets.UAT_API_ENDPOINT }}\` |" >> $GITHUB_STEP_SUMMARY
-                  echo "| **Frontend Origin** | \`${{ secrets.FRONTEND_URL }}\` |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **Endpoint** | \`${GATEWAY_ENDPOINT}\` |" >> $GITHUB_STEP_SUMMARY
+                  echo "| **Frontend Origin** | \`${FRONTEND_ORIGIN}\` |" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
 
                   if [ "${{ job.status }}" == "success" ]; then

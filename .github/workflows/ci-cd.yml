@@ -64,11 +64,11 @@ jobs:
                   if [ -d "HRS.Test" ]; then
                     dotnet-coverage collect "dotnet test HRS.Test/HRS.Test.csproj --configuration Release --no-build --verbosity normal" \
                       -f xml -o "./coverage/coverage.xml"
-                      
+
                     dotnet test HRS.Test/HRS.Test.csproj --configuration Release --no-build \
                       --logger "trx;LogFileName=TestResults.trx" \
                       --results-directory ./coverage
-                      
+
                     ls -la ./coverage/
                   else
                     echo "No test projects found, skipping tests."
@@ -187,7 +187,7 @@ jobs:
                   dotnet build --configuration Release /p:TreatWarningsAsErrors=false /p:RunAnalyzers=true
 
     security-scan:
-        name: Security Scan
+        name: Security Scan - Software Composition Analysis (SCA)
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -216,6 +216,7 @@ jobs:
                   if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
                     echo "::warning::Vulnerable packages found. Please review and update."
                     cat vulnerable-packages.txt
+                    exit 1
                   else
                     echo "No vulnerable packages found."
                   fi
@@ -226,9 +227,52 @@ jobs:
                   if grep -q "has the following deprecated packages" deprecated-packages.txt; then
                     echo "::warning::Deprecated packages found. Consider updating."
                     cat deprecated-packages.txt
+                    exit 1
                   else
                     echo "No deprecated packages found."
                   fi
+
+    Container-Security-Scan:
+        name: Run Trivy Scan- Container Security Scan
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Run Trivy FS Scan
+              uses: aquasecurity/trivy-action@v0.20.0
+              with:
+                  scan-type: "fs"
+                  scan-ref: "."
+                  format: "table"
+                  exit-code: "1" # ❗ fail pipeline if vulnerabilities found
+                  severity: "CRITICAL,HIGH"
+                  ignore-unfixed: true
+
+            - name: Build Docker Image
+              run: docker build -t my-app:latest .
+
+            - name: Run Trivy Image Scan
+              uses: aquasecurity/trivy-action@v0.20.0
+              with:
+                  image-ref: "my-app:latest"
+                  format: "table"
+                  exit-code: "1"
+                  severity: "CRITICAL,HIGH"
+                  ignore-unfixed: true
+
+            - name: Generate SARIF Report
+              uses: aquasecurity/trivy-action@v0.20.0
+              with:
+                  scan-type: "fs"
+                  scan-ref: "."
+                  format: "sarif"
+                  output: "trivy-results.sarif"
+
+            - name: Upload SARIF to GitHub Security
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: "trivy-results.sarif"
 
     docker-build:
         name: Build & Push Docker Image to ACR

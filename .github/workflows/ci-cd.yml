@@ -231,6 +231,18 @@ jobs:
                   else
                     echo "No deprecated packages found."
                   fi
+    secret-scan:
+        name: Scan for Secrets
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Run Gitleaks Scan
+              uses: gitleaks/gitleaks-action@v2
+              with:
+                  args: detect --source . --verbose --redact --exit-code 1
 
     Container-Security-Scan:
         name: Run Trivy Scan- Container Security Scan

@@ -89,6 +89,13 @@ app.Use(async (context, next) =>
     context.Response.Headers["X-Frame-Options"] = "DENY";
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.Headers["Cross-Origin-Resource-Policy"] = "same-origin";
+    context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
+
+    if (context.Request.IsHttps)
+    {
+        context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+    }
 
     // Disable shared/client caching for API responses unless overridden explicitly.
     context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private";

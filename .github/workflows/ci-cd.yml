@@ -518,7 +518,7 @@ jobs:
                   docker pull ${{ secrets.ACR_NAME }}.azurecr.io/hrs-email-service:${IMAGE_TAG}
 
                   echo "Starting container..."
-                  docker run -d -p 5000:80 --name hrs-email-service \
+                  docker run -d -p 5000:8080 --name hrs-email-service \
                     -e ASPNETCORE_ENVIRONMENT=Production \
                     -e Email__SmtpHost="${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}" \
                     -e Email__SmtpPort="${{ secrets.SMTP_PORT || '587' }}" \

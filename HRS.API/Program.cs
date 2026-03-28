@@ -84,6 +84,20 @@ app.UseSwaggerUI(c =>
 
 //app.UseHttpsRedirection();
 
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+
+    // Disable shared/client caching for API responses unless overridden explicitly.
+    context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private";
+    context.Response.Headers["Pragma"] = "no-cache";
+    context.Response.Headers["Expires"] = "0";
+
+    await next();
+});
+
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowWebClient");
 

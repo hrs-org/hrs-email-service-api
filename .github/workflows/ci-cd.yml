@@ -370,6 +370,7 @@ jobs:
               uses: zaproxy/action-baseline@99b9334bed0a0ff8d797764e76c9ecae53168436 # v0.10.0
               with:
                   target: "http://localhost:8080"
+                  rules_file_name: ".zap/rules.tsv"
                   cmd_options: "-a -j -l WARN -T 10 -I"
 
             - name: Upload DAST scan results
@@ -545,6 +546,7 @@ jobs:
               uses: zaproxy/action-baseline@99b9334bed0a0ff8d797764e76c9ecae53168436 # v0.10.0
               with:
                   target: "http://localhost:5000"
+                  rules_file_name: ".zap/rules.tsv"
                   cmd_options: "-a -j -l WARN -T 10 -I"
 
             - name: Upload DAST scan results

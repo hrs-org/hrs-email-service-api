@@ -78,7 +78,7 @@ jobs:
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                  name: test-results
+                  name: Unittest-results
                   path: ./coverage/
                   retention-days: 7
 
@@ -111,7 +111,7 @@ jobs:
             - name: Download test results
               uses: actions/download-artifact@v4
               with:
-                  name: test-results
+                  name: Unittest-results
                   path: ./coverage
               continue-on-error: true
 
@@ -317,7 +317,6 @@ jobs:
     pre-dast:
         name: Pre-DAST Security Scan
         runs-on: ubuntu-latest
-        needs: Container-Security-Scan
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -360,14 +359,14 @@ jobs:
             - name: OWASP ZAP Baseline Scan
               uses: zaproxy/action-baseline@99b9334bed0a0ff8d797764e76c9ecae53168436 # v0.10.0
               with:
-                  target: "http://localhost:5001/health"
+                  target: "http://localhost:5001"
                   cmd_options: "-a -j -l WARN -T 10 -I"
 
             - name: Upload DAST scan results
               uses: actions/upload-artifact@v4
               if: always()
               with:
-                  name: dast-scan-results
+                  name: pre-dast-scan-results
                   path: |
                       report_html.html
                       report_json.json
@@ -535,7 +534,7 @@ jobs:
             - name: OWASP ZAP Baseline Scan
               uses: zaproxy/action-baseline@99b9334bed0a0ff8d797764e76c9ecae53168436 # v0.10.0
               with:
-                  target: "http://localhost:5001/health"
+                  target: "http://localhost:5000"
                   cmd_options: "-a -j -l WARN -T 10 -I"
 
             - name: Upload DAST scan results
@@ -550,6 +549,6 @@ jobs:
                       report_xml.xml
                   retention-days: 7
 
-            - name: Cleanup pre-DAST container
+            - name: Cleanup DAST container
               if: always()
-              run: docker rm -f pre-dast-email-service || true
+              run: docker rm -f hrs-email-service || true

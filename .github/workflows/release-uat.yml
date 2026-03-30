@@ -109,6 +109,8 @@ jobs:
                   sed "s|__SMTP_PASSWORD__|${{ secrets.SMTP_PASSWORD || '' }}|g" | \
                   sed "s|__FROM_EMAIL__|${{ secrets.FROM_EMAIL || 'hikingrentalstore@gmail.com' }}|g" | \
                   sed "s|__FROM_NAME__|${{ secrets.FROM_NAME || 'Hiking Rental Store Team' }}|g" | \
+                  sed "s|__AUTH0_DOMAIN__|${{ secrets.AUTH0_DOMAIN }}|g" | \
+                  sed "s|__AUTH0_AUDIENCE__|${{ secrets.AUTH0_AUDIENCE }}|g" | \
                   sed "s|__ALLOWED_ORIGINS__|${{ secrets.ALLOWED_ORIGINS || 'http://localhost:4200' }}|g" | \
                   sed "s|__FRONTEND_URL__|${{ secrets.FRONTEND_URL || 'http://localhost:4200' }}|g" \
                   > k8s/deployment-final.yaml

@@ -98,10 +98,10 @@ builder.Services.AddAuthorization(options =>
 {
     // Email service scopes
     options.AddPolicy("write:email", policy =>
-        policy.Requirements.Add(new ScopeRequirement("write:email", auth0Domain)));
+    policy.Requirements.Add(new PermissionRequirement("write:email")));
 });
 
-builder.Services.AddSingleton<IAuthorizationHandler, ScopeHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 
 builder.Services.AddCors(options =>
 {

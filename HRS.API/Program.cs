@@ -1,9 +1,11 @@
-using System.Text;
+using System.Security.Claims;
 using HRS.API.Filters;
 using HRS.API.Middleware;
 using HRS.API.Services;
 using HRS.API.Services.Interfaces;
+using HRS.Shared.Core.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -57,6 +59,50 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 
+var auth0Domain = builder.Configuration["Auth0:Domain"]!;
+var auth0Audience = builder.Configuration["Auth0:Audience"]!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{auth0Domain}/";
+        options.Audience = auth0Audience;
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = $"https://{auth0Domain}/",
+            ValidAudience = auth0Audience,
+            NameClaimType = "sub"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var claims = context.Principal?.Claims.ToList() ?? new List<Claim>();
+                var subClaim = claims.FirstOrDefault(c => c.Type == "sub");
+                if (subClaim != null && !claims.Any(c => c.Type == ClaimTypes.NameIdentifier))
+                {
+                    var claimsIdentity = (ClaimsIdentity)context.Principal?.Identity!;
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.NameIdentifier, subClaim.Value));
+                }
+                await Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    // Email service scopes
+    options.AddPolicy("write:email", policy =>
+    policy.Requirements.Add(new PermissionRequirement("write:email")));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWebClient", policy =>
@@ -86,6 +132,8 @@ app.UseSwaggerUI(c =>
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowWebClient");
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

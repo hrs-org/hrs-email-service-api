@@ -2,12 +2,14 @@ using HRS.API.Contracts.DTOs;
 using HRS.API.Contracts.DTOs.Email;
 using HRS.API.Services.Interfaces;
 using HRS.Shared.Core.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRS.API.Controllers;
 
 [ApiController]
 [Route("api/email")]
+[Authorize(Policy = "write:email")]
 public class EmailController : ControllerBase
 {
     private readonly IEmailService _emailService;

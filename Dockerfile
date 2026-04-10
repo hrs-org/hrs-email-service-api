@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
 WORKDIR /app
 
 # Install required tools using Alpine package manager
-RUN apk add --no-cache \
+RUN apk update && apk upgrade --no-cache libcrypto3 openssl && \
+    apk add --no-cache \
         ca-certificates \
         curl \
         busybox-extras \

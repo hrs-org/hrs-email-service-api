@@ -28,6 +28,7 @@ env:
     NAMESPACE: "${{ github.event.inputs.environment }}"
     DEPLOYMENT_NAME: hrs-email-service
     SERVICE_NAME: hrs-email-service
+    ACR_NAME: ${{ secrets.ACR_NAME }}
 
 jobs:
     deploy-to-aks:
@@ -36,15 +37,15 @@ jobs:
         environment: ${{ github.event.inputs.environment }}
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
             - name: Set up Azure CLI
-              uses: azure/login@v1
+              uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d
               with:
                   creds: ${{ secrets.AZURE_CREDENTIALS }}
 
             - name: Set up kubectl
-              uses: azure/setup-kubectl@v3
+              uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8
               with:
                   version: "latest"
 
@@ -68,7 +69,7 @@ jobs:
                   az aks update \
                     --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
                     --name ${{ env.AKS_CLUSTER_NAME }} \
-                    --attach-acr ${{ secrets.ACR_NAME }} || echo "ACR already attached or unable to attach"
+                    --attach-acr $ACR_NAME || echo "ACR already attached or unable to attach"
 
             - name: Verify image exists in ACR
               run: |
@@ -77,14 +78,14 @@ jobs:
                   # List all available tags
                   echo "Available tags:"
                   az acr repository show-tags \
-                    --name ${{ secrets.ACR_NAME }} \
+                    --name $ACR_NAME \
                     --repository hrs-email-service \
                     --orderby time_desc \
                     --output table
 
                   # Check if specific tag exists
                   if az acr repository show-tags \
-                      --name ${{ secrets.ACR_NAME }} \
+                      --name $ACR_NAME \
                       --repository hrs-email-service \
                       --output tsv | grep -q "^${{ github.event.inputs.version }}$"; then
                     echo "✅ Image tag '${{ github.event.inputs.version }}' found in ACR"
@@ -96,23 +97,42 @@ jobs:
                   fi
 
             - name: Prepare deployment manifest
+              env:
+                  SMTP_HOST: ${{ secrets.SMTP_HOST }}
+                  SMTP_PORT: ${{ secrets.SMTP_PORT }}
+                  SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+                  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+                  FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+                  FROM_NAME: ${{ secrets.FROM_NAME }}
+                  AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+                  AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+                  ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+                  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
               run: |
                   echo "Preparing deployment manifest with secrets..."
 
+                  SMTP_HOST="${SMTP_HOST:-smtp.gmail.com}"
+                  SMTP_PORT="${SMTP_PORT:-587}"
+                  SMTP_USERNAME="${SMTP_USERNAME:-hikingrentalstore@gmail.com}"
+                  FROM_EMAIL="${FROM_EMAIL:-hikingrentalstore@gmail.com}"
+                  FROM_NAME="${FROM_NAME:-Hiking Rental Store Team}"
+                  ALLOWED_ORIGINS="${ALLOWED_ORIGINS:-http://localhost:4200}"
+                  FRONTEND_URL="${FRONTEND_URL:-http://localhost:4200}"
+
                   # Replace placeholders in the deployment file
-                  sed "s|__ACR_NAME__|${{ secrets.ACR_NAME }}|g" k8s/deployment-uat.yaml | \
+                  sed "s|__ACR_NAME__|$ACR_NAME|g" k8s/deployment-uat.yaml | \
                   sed "s|__IMAGE_TAG__|${{ github.event.inputs.version }}|g" | \
                   sed "s|__NAMESPACE__|${{ env.NAMESPACE }}|g" | \
-                  sed "s|__SMTP_HOST__|${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}|g" | \
-                  sed "s|__SMTP_PORT__|${{ secrets.SMTP_PORT || '587' }}|g" | \
-                  sed "s|__SMTP_USERNAME__|${{ secrets.SMTP_USERNAME || 'hikingrentalstore@gmail.com' }}|g" | \
-                  sed "s|__SMTP_PASSWORD__|${{ secrets.SMTP_PASSWORD || '' }}|g" | \
-                  sed "s|__FROM_EMAIL__|${{ secrets.FROM_EMAIL || 'hikingrentalstore@gmail.com' }}|g" | \
-                  sed "s|__FROM_NAME__|${{ secrets.FROM_NAME || 'Hiking Rental Store Team' }}|g" | \
-                  sed "s|__AUTH0_DOMAIN__|${{ secrets.AUTH0_DOMAIN }}|g" | \
-                  sed "s|__AUTH0_AUDIENCE__|${{ secrets.AUTH0_AUDIENCE }}|g" | \
-                  sed "s|__ALLOWED_ORIGINS__|${{ secrets.ALLOWED_ORIGINS || 'http://localhost:4200' }}|g" | \
-                  sed "s|__FRONTEND_URL__|${{ secrets.FRONTEND_URL || 'http://localhost:4200' }}|g" \
+                  sed "s|__SMTP_HOST__|$SMTP_HOST|g" | \
+                  sed "s|__SMTP_PORT__|$SMTP_PORT|g" | \
+                  sed "s|__SMTP_USERNAME__|$SMTP_USERNAME|g" | \
+                  sed "s|__SMTP_PASSWORD__|$SMTP_PASSWORD|g" | \
+                  sed "s|__FROM_EMAIL__|$FROM_EMAIL|g" | \
+                  sed "s|__FROM_NAME__|$FROM_NAME|g" | \
+                  sed "s|__AUTH0_DOMAIN__|$AUTH0_DOMAIN|g" | \
+                  sed "s|__AUTH0_AUDIENCE__|$AUTH0_AUDIENCE|g" | \
+                  sed "s|__ALLOWED_ORIGINS__|$ALLOWED_ORIGINS|g" | \
+                  sed "s|__FRONTEND_URL__|$FRONTEND_URL|g" \
                   > k8s/deployment-final.yaml
 
                   # Show the final manifest for debugging (mask sensitive values)
@@ -237,12 +257,12 @@ jobs:
         environment: ${{ github.event.inputs.environment }}
         steps:
             - name: Set up Azure CLI
-              uses: azure/login@v1
+              uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d
               with:
                   creds: ${{ secrets.AZURE_CREDENTIALS }}
 
             - name: Set up kubectl
-              uses: azure/setup-kubectl@v3
+              uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8
               with:
                   version: "latest"
 
@@ -269,12 +289,12 @@ jobs:
         environment: ${{ github.event.inputs.environment }}
         steps:
             - name: Set up Azure CLI
-              uses: azure/login@v1
+              uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d
               with:
                   creds: ${{ secrets.AZURE_CREDENTIALS }}
 
             - name: Set up kubectl
-              uses: azure/setup-kubectl@v3
+              uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8
               with:
                   version: "latest"
 
